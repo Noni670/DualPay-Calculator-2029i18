@@ -1,3 +1,119 @@
+!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DualPay Calculator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Meta tags for PWA look and feel -->
+    <meta name="theme-color" content="#f0f9ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        /* Custom Font Assignments */
+        .font-comfortaa { font-family: 'Comfortaa', cursive; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+
+        /* Smooth Floating Animation */
+        @keyframes floatAnim {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            33% { transform: translate(10px, -15px) rotate(5deg) scale(1.1); }
+            66% { transform: translate(-5px, 10px) rotate(-5deg) scale(0.95); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+
+        .bg-symbol {
+            animation: floatAnim 8s ease-in-out infinite;
+            opacity: 0.07; /* Едва забележими */
+            user-select: none;
+            pointer-events: none;
+        }
+        
+        /* Delays for natural feel */
+        .bg-symbol:nth-child(2n) { animation-duration: 11s; animation-delay: -2s; }
+        .bg-symbol:nth-child(3n) { animation-duration: 9s; animation-delay: -5s; }
+        .bg-symbol:nth-child(4n) { animation-duration: 13s; animation-delay: -1s; }
+
+        /* Custom Scrollbar hide */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Input styling to prevent zoom on mobile */
+        input, select { font-size: 16px !important; }
+
+        /* Glass effect enhancement */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 h-screen overflow-hidden flex flex-col items-center justify-center font-montserrat relative selection:bg-purple-200">
+
+    <!-- Dynamic Background Container -->
+    <div id="dynamic-bg" class="fixed inset-0 z-0 grid grid-cols-6 grid-rows-6 gap-4 overflow-hidden pointer-events-none items-center justify-items-center">
+        <!-- JS will populate this with alternating symbols -->
+    </div>
+
+    <!-- Main App Container -->
+    <main class="relative z-10 w-full max-w-md p-6 h-full max-h-[90vh] flex flex-col">
+        
+        <!-- App Card -->
+        <div class="glass-panel w-full rounded-3xl p-6 flex flex-col h-full overflow-y-auto no-scrollbar shadow-2xl transition-all duration-300">
+            
+            <!-- Header / Logo -->
+            <header class="relative flex items-center justify-center mb-6 shrink-0">
+                <div class="flex flex-col items-center gap-1">
+                    <div class="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center shadow-lg text-white font-comfortaa font-bold text-xl mb-1">
+                        €<span class="mx-0.5 opacity-60">|</span>лв
+                    </div>
+                    <div class="text-center">
+                        <h1 class="font-comfortaa font-bold text-2xl text-black tracking-tight">DualPay</h1>
+                        <p class="text-xs text-gray-500 font-medium">Калкулатор за ресто</p>
+                    </div>
+                </div>
+                <!-- Install Button (Hidden by default, shown via JS if PWA criteria met) -->
+                <button id="installBtn" class="hidden absolute right-0 top-4 p-2 bg-black text-white rounded-full shadow-md active:scale-95 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Content Area -->
+            <div class="flex-grow flex flex-col gap-5">
+
+                <!-- 1. Total to Pay -->
+            <div class="space-y-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-500 ml-1">Дължима сума</label>
+                <div class="flex rounded-2xl shadow-sm overflow-hidden border border-pink-200/50">
+                    <input type="number" inputmode="decimal" id="billAmount" placeholder="0.00" 
+                        class="w-2/3 p-4 text-2xl font-bold bg-pink-100 text-black outline-none placeholder-pink-300 transition-colors focus:bg-pink-50">
+                    <select id="billCurrency" class="w-1/3 bg-pink-200 text-black font-comfortaa font-bold text-center outline-none cursor-pointer hover:bg-pink-300 transition-colors">
+                        <option value="BGN">лв</option>
+                        <option value="EUR">EUR</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Separator -->
+                <div class="flex items-center gap-2 opacity-30 my-1">
+                    <div class="h-px bg-black flex-1"></div>
+                    <span class="text-xs font-comfortaa">ПЛАТЕНО</span>
+                    <div class="h-px bg-black flex-1"></div>
+                </div>
 
                 <!-- 2. Paid Amounts (Split Columns with Buttons) -->
                 <div class="grid grid-cols-2 gap-4">
@@ -341,3 +457,5 @@
     </script>
 </body>
 </html>
+            
+            
