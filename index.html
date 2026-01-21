@@ -8,404 +8,235 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Meta tags for PWA look and feel -->
-    <meta name="theme-color" content="#f0f9ff">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;500;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* Custom Font Assignments */
-        .font-comfortaa { font-family: 'Comfortaa', cursive; }
-        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        /* Custom Fonts Application */
+        body { font-family: 'Montserrat', sans-serif; }
+        h1, h2, h3, .app-font { font-family: 'Comfortaa', cursive; }
 
-        /* Smooth Floating Animation */
+        /* Animation Keyframes */
         @keyframes floatAnim {
             0% { transform: translate(0, 0) rotate(0deg) scale(1); }
             33% { transform: translate(10px, -15px) rotate(5deg) scale(1.1); }
-            66% { transform: translate(-5px, 10px) rotate(-5deg) scale(0.95); }
+            66% { transform: translate(-5px, 10px) rotate(-3deg) scale(0.95); }
             100% { transform: translate(0, 0) rotate(0deg) scale(1); }
         }
 
         .bg-symbol {
             animation: floatAnim 8s ease-in-out infinite;
-            opacity: 0.07; /* Едва забележими */
-            user-select: none;
-            pointer-events: none;
+            will-change: transform;
         }
-        
-        /* Delays for natural feel */
-        .bg-symbol:nth-child(2n) { animation-duration: 11s; animation-delay: -2s; }
-        .bg-symbol:nth-child(3n) { animation-duration: 9s; animation-delay: -5s; }
-        .bg-symbol:nth-child(4n) { animation-duration: 13s; animation-delay: -1s; }
 
-        /* Custom Scrollbar hide */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Input styling to prevent zoom on mobile */
-        input, select { font-size: 16px !important; }
-
-        /* Glass effect enhancement */
+        /* Glassmorphism */
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Input styling adjustments */
+        input:focus { outline: none; ring: 2px; }
+        
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* Custom toggle transition */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #2563EB; /* Blue-600 */
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #2563EB; /* Blue-600 */
         }
     </style>
 </head>
-<body class="bg-blue-50 text-gray-800 h-screen overflow-hidden flex flex-col items-center justify-center font-montserrat relative selection:bg-purple-200">
+<body class="bg-purple-200 min-h-screen relative overflow-hidden flex items-center justify-center p-4 select-none">
 
     <!-- Dynamic Background Container -->
-    <div id="dynamic-bg" class="fixed inset-0 z-0 grid grid-cols-6 grid-rows-6 gap-4 overflow-hidden pointer-events-none items-center justify-items-center">
-        <!-- JS will populate this with alternating symbols -->
+    <div id="dynamic-bg" class="fixed inset-0 grid grid-cols-6 grid-rows-6 pointer-events-none z-0 opacity-40">
+        <!-- JS will populate this -->
     </div>
 
-    <!-- Main App Container -->
-    <main class="relative z-10 w-full max-w-md p-6 h-full max-h-[90vh] flex flex-col">
+    <!-- Main App Window -->
+    <main class="glass-panel w-full max-w-md rounded-3xl p-6 relative z-10 flex flex-col gap-5 transition-all duration-300">
         
-        <!-- App Card -->
-        <div class="glass-panel w-full rounded-3xl p-6 flex flex-col h-full overflow-y-auto no-scrollbar shadow-2xl transition-all duration-300">
-            
-            <!-- Header / Logo -->
-            <header class="relative flex items-center justify-center mb-6 shrink-0">
-                <div class="flex flex-col items-center gap-1">
-                    <div class="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center shadow-lg text-white font-comfortaa font-bold text-xl mb-1">
-                        €<span class="mx-0.5 opacity-60">|</span>лв
-                    </div>
-                    <div class="text-center">
-                        <h1 class="font-comfortaa font-bold text-2xl text-black tracking-tight">DualPay</h1>
-                        <p class="text-xs text-gray-500 font-medium">Калкулатор за ресто</p>
-                    </div>
-                </div>
-                <!-- Install Button (Hidden by default, shown via JS if PWA criteria met) -->
-                <button id="installBtn" class="hidden absolute right-0 top-4 p-2 bg-black text-white rounded-full shadow-md active:scale-95 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
+        <!-- Header & Logo -->
+        <header class="flex items-center gap-4 mb-2">
+            <!-- Canvas Icon Placeholder (generated by JS) -->
+            <canvas id="appIcon" width="64" height="64" class="rounded-2xl shadow-lg"></canvas>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 tracking-tight">DualPay</h1>
+                <p class="text-xs text-gray-500 font-medium">Калкулатор за ресто</p>
+            </div>
+        </header>
+
+        <!-- Section: Amount Due -->
+        <div class="bg-pink-700 rounded-2xl p-4 shadow-inner text-white transition-transform active:scale-[0.99]">
+            <label class="app-font text-pink-100 text-sm block mb-1">Сума за плащане</label>
+            <div class="flex items-center justify-between">
+                <input type="number" id="inputDue" placeholder="0.00" inputmode="decimal" 
+                    class="bg-transparent text-4xl font-bold w-full placeholder-pink-300/50 outline-none">
+                
+                <!-- Currency Toggle -->
+                <button id="toggleDueCurrency" class="ml-2 bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 px-3 rounded-xl transition-colors app-font text-sm border border-pink-400">
+                    BGN
                 </button>
-            </header>
-
-            <!-- Content Area -->
-            <div class="flex-grow flex flex-col gap-5">
-
-                <!-- 1. Total to Pay -->
-            <div class="space-y-2">
-                <label class="text-xs font-bold uppercase tracking-wider text-gray-500 ml-1">Дължима сума</label>
-                <div class="flex rounded-2xl shadow-sm overflow-hidden border border-pink-200/50">
-                    <input type="number" inputmode="decimal" id="billAmount" placeholder="0.00" 
-                        class="w-2/3 p-4 text-2xl font-bold bg-pink-100 text-black outline-none placeholder-pink-300 transition-colors focus:bg-pink-50">
-                    <select id="billCurrency" class="w-1/3 bg-pink-200 text-black font-comfortaa font-bold text-center outline-none cursor-pointer hover:bg-pink-300 transition-colors">
-                        <option value="BGN">лв</option>
-                        <option value="EUR">EUR</option>
-                    </select>
-                </div>
             </div>
-
-            <!-- Separator -->
-                <div class="flex items-center gap-2 opacity-30 my-1">
-                    <div class="h-px bg-black flex-1"></div>
-                    <span class="text-xs font-comfortaa">ПЛАТЕНО</span>
-                    <div class="h-px bg-black flex-1"></div>
-                </div>
-
-                <!-- 2. Paid Amounts (Split Columns with Buttons) -->
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- Left: Paid in BGN -->
-                    <div class="flex flex-col gap-2">
-                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">В лева (лв)</label>
-                        <div class="relative">
-                            <input type="number" inputmode="decimal" id="paidBGN" placeholder="0" 
-                                class="w-full p-3 pl-3 pr-8 rounded-xl bg-white border border-gray-100 shadow-inner text-lg font-bold focus:ring-2 focus:ring-black/10 outline-none transition-all">
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">лв</span>
-                        </div>
-                        <button id="btnCalcBGN" class="w-full py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold transition-colors shadow-sm active:scale-95">
-                            Ресто в лв
-                        </button>
-                    </div>
-
-                    <!-- Right: Paid in EUR -->
-                    <div class="flex flex-col gap-2">
-                        <label class="text-[10px] font-bold uppercase text-gray-400 ml-1">В евро (€)</label>
-                        <div class="relative">
-                            <input type="number" inputmode="decimal" id="paidEUR" placeholder="0" 
-                                class="w-full p-3 pl-3 pr-8 rounded-xl bg-white border border-gray-100 shadow-inner text-lg font-bold focus:ring-2 focus:ring-black/10 outline-none transition-all">
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">€</span>
-                        </div>
-                        <button id="btnCalcEUR" class="w-full py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-xl text-xs font-bold transition-colors shadow-sm active:scale-95">
-                            Ресто в €
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Error Box (Hidden by default) -->
-                <div id="errorBox" class="hidden p-3 bg-red-100 text-red-600 rounded-xl text-sm font-medium border border-red-200 text-center animate-pulse flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
-                    Недостатъчна сума!
-                </div>
-
-                <!-- 3. Result Section -->
-                <div id="resultSection" class="mt-auto opacity-0 translate-y-4 transition-all duration-500 ease-out">
-                    <div class="bg-black text-white rounded-2xl p-5 shadow-xl relative overflow-hidden">
-                        <!-- Decorative glow -->
-                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-600 rounded-full blur-3xl opacity-30"></div>
-
-                        <div class="relative z-10">
-                            <div class="flex justify-between items-end mb-2">
-                                <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">Ресто</span>
-                                
-                                <!-- Result Toggle -->
-                                <div class="flex bg-gray-800 rounded-lg p-0.5">
-                                    <button id="resToggleBGN" class="px-3 py-1 rounded-md text-xs font-bold transition-all bg-white text-black">BGN</button>
-                                    <button id="resToggleEUR" class="px-3 py-1 rounded-md text-xs font-bold text-gray-400 transition-all hover:text-white">EUR</button>
-                                </div>
-                            </div>
-                            
-                            <!-- Main Result Value -->
-                            <div class="flex items-baseline gap-2">
-                                <span id="changeValue" class="text-4xl font-bold font-comfortaa tracking-tight">0.00</span>
-                                <span id="changeSymbol" class="text-xl text-purple-400 font-medium">лв</span>
-                            </div>
-
-                            <!-- Secondary Result Value -->
-                            <div class="mt-2 pt-2 border-t border-gray-800 flex justify-between items-center">
-                                <span class="text-xs text-gray-500">Еквивалент:</span>
-                                <span id="secondaryValue" class="text-sm font-medium text-gray-300">0.00 €</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <footer class="mt-6 pt-4 border-t border-gray-200 text-center shrink-0">
-                <p class="text-[10px] text-gray-500 font-mono mb-1">Курс: 1 EUR = 1.95583 BGN</p>
-                <p class="text-[10px] text-gray-400 font-comfortaa">© Н.Дикарло</p>
-            </footer>
         </div>
+
+        <!-- Section: Payments -->
+        <div class="space-y-3">
+            <div class="flex gap-3">
+                <!-- Paid in BGN -->
+                <div class="flex-1 bg-white/70 rounded-xl p-3 border border-purple-100 shadow-sm focus-within:ring-2 focus-within:ring-blue-600 transition-all">
+                    <label class="text-xs text-gray-500 font-bold block mb-1">ПЛАТЕНО В ЛВ</label>
+                    <input type="number" id="inputPaidBGN" placeholder="0.00" inputmode="decimal"
+                        class="w-full bg-transparent text-xl font-semibold text-gray-800 outline-none">
+                </div>
+
+                <!-- Paid in EUR -->
+                <div class="flex-1 bg-white/70 rounded-xl p-3 border border-purple-100 shadow-sm focus-within:ring-2 focus-within:ring-blue-600 transition-all">
+                    <label class="text-xs text-gray-500 font-bold block mb-1">ПЛАТЕНО В €</label>
+                    <input type="number" id="inputPaidEUR" placeholder="0.00" inputmode="decimal"
+                        class="w-full bg-transparent text-xl font-semibold text-gray-800 outline-none">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Results -->
+        <div id="resultContainer" class="bg-blue-50 rounded-2xl p-4 border border-blue-100 hidden opacity-0 transition-all duration-500 ease-out">
+            <div class="flex justify-between items-end mb-2">
+                <span class="app-font text-blue-800 font-bold">Ресто</span>
+                
+                <!-- Change Currency Switcher -->
+                <div class="flex bg-blue-200 rounded-lg p-1">
+                    <button id="btnResBGN" class="px-3 py-1 rounded-md text-xs font-bold transition-all bg-white text-blue-700 shadow-sm">BGN</button>
+                    <button id="btnResEUR" class="px-3 py-1 rounded-md text-xs font-bold transition-all text-blue-600 hover:bg-white/50">EUR</button>
+                </div>
+            </div>
+
+            <!-- Main Result Value -->
+            <div class="text-right">
+                <div id="changeMain" class="text-4xl font-extrabold text-blue-900 leading-none mb-1">0.00 <span class="text-2xl">лв</span></div>
+                <div id="changeSec" class="text-sm font-semibold text-blue-400">0.00 €</div>
+            </div>
+        </div>
+
+        <!-- Error Box -->
+        <div id="errorBox" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded-r hidden">
+            <p class="font-bold text-sm">Недостатъчна сума!</p>
+            <p class="text-xs" id="missingAmount">Не достигат: 0.00 лв</p>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto pt-2 text-center opacity-70">
+            <div class="text-xs font-mono text-gray-600 mb-1 bg-white/40 inline-block px-2 py-1 rounded">
+                Курс: 1 EUR = 1.95583 BGN
+            </div>
+            <p class="text-[10px] font-bold text-blue-900 tracking-wider uppercase">© Нона Дикарло</p>
+        </footer>
+
     </main>
 
-    <!-- JavaScript Logic -->
     <script>
-        // --- 1. CONFIGURATION & STATE ---
+        // --- CONSTANTS & STATE ---
         const RATE = 1.95583;
-        let state = {
-            resultMode: 'BGN' // 'BGN' or 'EUR'
-        };
-
-        // --- 2. DOM ELEMENTS ---
+        let dueCurrency = 'BGN'; // 'BGN' or 'EUR'
+        let resultCurrency = 'BGN'; // 'BGN' or 'EUR'
+        
+        // --- DOM ELEMENTS ---
         const els = {
-            bg: document.getElementById('dynamic-bg'),
-            inputs: {
-                bill: document.getElementById('billAmount'),
-                billCurrency: document.getElementById('billCurrency'),
-                paidBGN: document.getElementById('paidBGN'),
-                paidEUR: document.getElementById('paidEUR')
-            },
-            buttons: {
-                calcBGN: document.getElementById('btnCalcBGN'),
-                calcEUR: document.getElementById('btnCalcEUR')
-            },
-            error: document.getElementById('errorBox'),
-            result: {
-                section: document.getElementById('resultSection'),
-                value: document.getElementById('changeValue'),
-                symbol: document.getElementById('changeSymbol'),
-                secondary: document.getElementById('secondaryValue'),
-                toggleBGN: document.getElementById('resToggleBGN'),
-                toggleEUR: document.getElementById('resToggleEUR')
-            },
-            installBtn: document.getElementById('installBtn')
+            inputDue: document.getElementById('inputDue'),
+            toggleDue: document.getElementById('toggleDueCurrency'),
+            inputPaidBGN: document.getElementById('inputPaidBGN'),
+            inputPaidEUR: document.getElementById('inputPaidEUR'),
+            resultBox: document.getElementById('resultContainer'),
+            changeMain: document.getElementById('changeMain'),
+            changeSec: document.getElementById('changeSec'),
+            errorBox: document.getElementById('errorBox'),
+            missingText: document.getElementById('missingAmount'),
+            btnResBGN: document.getElementById('btnResBGN'),
+            btnResEUR: document.getElementById('btnResEUR'),
+            bgContainer: document.getElementById('dynamic-bg'),
+            iconCanvas: document.getElementById('appIcon')
         };
 
-        // --- 3. BACKGROUND GENERATION ---
+        // --- BACKGROUND GENERATION ---
         function initBackground() {
+            const rows = 6;
             const cols = 6;
-            const rows = 8; // Enough to cover taller screens
-            let isEuro = true; // Toggle starter
-
-            for (let i = 0; i < cols * rows; i++) {
-                const span = document.createElement('span');
-                // Alternating pattern logic
-                const row = Math.floor(i / cols);
-                const col = i % cols;
-                // Chessboard pattern: (row + col) % 2
-                const symbol = ((row + col) % 2 === 0) ? '€' : 'лв';
-                
-                span.textContent = symbol;
-                span.className = 'bg-symbol text-4xl font-comfortaa text-black font-bold';
-                els.bg.appendChild(span);
-            }
-        }
-
-        // --- 4. CALCULATION LOGIC ---
-        function calculate() {
-            // 1. Get Values
-            const billInput = parseFloat(els.inputs.bill.value) || 0;
-            const paidBGNInput = parseFloat(els.inputs.paidBGN.value) || 0;
-            const paidEURInput = parseFloat(els.inputs.paidEUR.value) || 0;
-
-            // 2. Normalize everything to BGN for math
-            let targetInBGN = (els.inputs.billCurrency.value === 'BGN') 
-                ? billInput 
-                : billInput * RATE;
-
-            // Sum both inputs (BGN + EUR converted to BGN)
-            let totalPaidInBGN = paidBGNInput + (paidEURInput * RATE);
-
-            // 3. Calculate Change (in BGN)
-            let changeInBGN = totalPaidInBGN - targetInBGN;
-
-            // 4. Handle UI States
-            if (billInput > 0 && totalPaidInBGN < targetInBGN - 0.009) {
-                // Error: Not enough money
-                els.error.classList.remove('hidden');
-                hideResult();
-            } else if (billInput > 0) {
-                // Success
-                els.error.classList.add('hidden');
-                showResult(changeInBGN);
-            } else {
-                // Reset/Idle
-                els.error.classList.add('hidden');
-                hideResult();
-            }
-        }
-
-        function showResult(changeBGN) {
-            els.result.section.classList.remove('opacity-0', 'translate-y-4');
+            els.bgContainer.innerHTML = '';
             
-            let displayValue, displaySymbol, secValue, secSymbol;
-
-            if (state.resultMode === 'BGN') {
-                displayValue = changeBGN;
-                displaySymbol = 'лв';
-                secValue = changeBGN / RATE;
-                secSymbol = '€';
-                
-                // Toggle Styling updates
-                els.result.toggleBGN.className = "px-3 py-1 rounded-md text-xs font-bold transition-all bg-white text-black shadow-sm";
-                els.result.toggleEUR.className = "px-3 py-1 rounded-md text-xs font-bold text-gray-400 transition-all hover:text-white";
-                
-                // Button active states
-                els.buttons.calcBGN.classList.add('ring-2', 'ring-blue-400');
-                els.buttons.calcEUR.classList.remove('ring-2', 'ring-purple-400');
-
-            } else {
-                displayValue = changeBGN / RATE;
-                displaySymbol = '€';
-                secValue = changeBGN;
-                secSymbol = 'лв';
-
-                // Toggle Styling updates
-                els.result.toggleBGN.className = "px-3 py-1 rounded-md text-xs font-bold text-gray-400 transition-all hover:text-white";
-                els.result.toggleEUR.className = "px-3 py-1 rounded-md text-xs font-bold transition-all bg-white text-black shadow-sm";
-                
-                // Button active states
-                els.buttons.calcBGN.classList.remove('ring-2', 'ring-blue-400');
-                els.buttons.calcEUR.classList.add('ring-2', 'ring-purple-400');
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const span = document.createElement('span');
+                    // Strictly alternating checkerboard
+                    const isEuro = (r + c) % 2 === 0;
+                    span.textContent = isEuro ? '€' : 'лв';
+                    
+                    // Styling
+                    span.className = `flex items-center justify-center text-4xl font-bold bg-symbol select-none text-purple-800`;
+                    
+                    // Randomize animation delay so they don't move in total sync
+                    span.style.animationDelay = `${Math.random() * 5}s`;
+                    span.style.opacity = '0.15'; // Clear visibility but subtle
+                    
+                    els.bgContainer.appendChild(span);
+                }
             }
-
-            // Update DOM
-            els.result.value.textContent = displayValue.toFixed(2);
-            els.result.symbol.textContent = displaySymbol;
-            els.result.secondary.textContent = `${secValue.toFixed(2)} ${secSymbol}`;
         }
 
-        function hideResult() {
-            els.result.section.classList.add('opacity-0', 'translate-y-4');
-            els.buttons.calcBGN.classList.remove('ring-2', 'ring-blue-400');
-            els.buttons.calcEUR.classList.remove('ring-2', 'ring-purple-400');
-        }
-
-        // --- 5. EVENT LISTENERS ---
-        els.inputs.bill.addEventListener('input', calculate);
-        els.inputs.paidBGN.addEventListener('input', calculate);
-        els.inputs.paidEUR.addEventListener('input', calculate);
-        els.inputs.billCurrency.addEventListener('change', calculate);
-
-        // Standard Toggles
-        els.result.toggleBGN.addEventListener('click', () => {
-            state.resultMode = 'BGN';
-            calculate();
-        });
-        els.result.toggleEUR.addEventListener('click', () => {
-            state.resultMode = 'EUR';
-            calculate();
-        });
-
-        // New Layout Buttons
-        els.buttons.calcBGN.addEventListener('click', () => {
-            state.resultMode = 'BGN';
-            calculate();
-            // Scroll to result if needed on small screens
-            els.result.section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-
-        els.buttons.calcEUR.addEventListener('click', () => {
-            state.resultMode = 'EUR';
-            calculate();
-             // Scroll to result if needed on small screens
-             els.result.section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-
-        // --- 6. PWA GENERATION (The Magic) ---
-        async function initPWA() {
-            // A. Generate Icon via Canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-
-            // Draw Purple Background
-            ctx.fillStyle = '#9333ea'; // Purple 600
+        // --- ICON & PWA GENERATION ---
+        function initPWA() {
+            const ctx = els.iconCanvas.getContext('2d');
+            
+            // Draw Icon (Pink Tile, Rounded, Blue Accents)
+            // Background
+            ctx.fillStyle = '#EC4899'; // Pink-500
             ctx.beginPath();
-            ctx.roundRect(0, 0, 512, 512, 100);
+            ctx.roundRect(0, 0, 64, 64, 16);
             ctx.fill();
-
-            // Draw Text
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 220px Comfortaa';
+            
+            // Text
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 24px Comfortaa';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('€', 170, 230);
-            ctx.fillText('лв', 340, 310);
-            
-            // Draw connector
-            ctx.font = 'bold 100px Arial';
-            ctx.fillText('⇄', 256, 256);
+            ctx.fillText('€⇄лв', 32, 32);
 
-            const iconUrl = canvas.toDataURL('image/png');
+            // Create Icon URL
+            const iconUrl = els.iconCanvas.toDataURL('image/png');
 
-            // Set Favicon dynamically
-            const link = document.createElement('link');
-            link.rel = 'icon';
+            // 1. Set Favicon
+            let link = document.querySelector("link[rel~='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
             link.href = iconUrl;
-            document.head.appendChild(link);
 
-            // B. Generate Manifest
+            // 2. Generate Manifest
             const manifest = {
                 name: "DualPay Calculator",
                 short_name: "DualPay",
                 start_url: ".",
                 display: "standalone",
-                background_color: "#f0f9ff",
-                theme_color: "#f0f9ff",
+                background_color: "#E9D5FF",
+                theme_color: "#EC4899",
                 icons: [{
                     src: iconUrl,
-                    sizes: "512x512",
+                    sizes: "64x64",
                     type: "image/png"
                 }]
             };
-
+            
             const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
             const manifestUrl = URL.createObjectURL(manifestBlob);
             const manifestLink = document.createElement('link');
@@ -413,49 +244,127 @@
             manifestLink.href = manifestUrl;
             document.head.appendChild(manifestLink);
 
-            // C. Service Worker for PWA installation capability
-            if ('serviceWorker' in navigator) {
-                const swContent = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('activate', (e) => self.clients.claim());
-                    self.addEventListener('fetch', (e) => {});
-                `;
-                const swBlob = new Blob([swContent], {type: 'text/javascript'});
-                const swUrl = URL.createObjectURL(swBlob);
-                
-                try {
-                    await navigator.serviceWorker.register(swUrl);
-                    console.log('SW Registered');
-                } catch (err) {
-                    console.log('SW Error:', err);
-                }
-            }
-
-            // D. Handle Install Prompt
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                let deferredPrompt = e;
-                els.installBtn.classList.remove('hidden');
-                
-                els.installBtn.addEventListener('click', () => {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                            els.installBtn.classList.add('hidden');
-                        }
-                    });
+            // 3. Service Worker (Offline capability)
+            const swCode = `
+                self.addEventListener('install', (e) => {
+                    e.waitUntil(self.skipWaiting());
                 });
-            });
+                self.addEventListener('fetch', (e) => {
+                    // Simple passthrough for single file structure
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            const swUrl = URL.createObjectURL(swBlob);
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log('SW Registered'))
+                    .catch(err => console.log('SW Fail:', err));
+            }
         }
 
-        // --- INIT ---
-        window.addEventListener('DOMContentLoaded', () => {
-            initBackground();
-            initPWA();
+        // --- CALCULATOR LOGIC ---
+        function calculate() {
+            // Get raw values
+            let dueVal = parseFloat(els.inputDue.value) || 0;
+            let paidBGN = parseFloat(els.inputPaidBGN.value) || 0;
+            let paidEUR = parseFloat(els.inputPaidEUR.value) || 0;
+
+            if (dueVal === 0) {
+                els.resultBox.classList.add('hidden');
+                els.resultBox.classList.remove('block', 'opacity-100');
+                els.errorBox.classList.add('hidden');
+                return;
+            }
+
+            // Normalize EVERYTHING to BGN for calculation
+            let totalDueBGN = (dueCurrency === 'EUR') ? dueVal * RATE : dueVal;
+            let totalPaidBGN = paidBGN + (paidEUR * RATE);
+
+            let diffBGN = totalPaidBGN - totalDueBGN;
+
+            if (diffBGN < -0.009) { // Tolerance for float errors
+                // Error state
+                els.resultBox.classList.add('hidden');
+                els.resultBox.classList.remove('block', 'opacity-100');
+                els.errorBox.classList.remove('hidden');
+                
+                let missing = Math.abs(diffBGN);
+                els.missingText.textContent = `Не достигат: ${formatMoney(missing)} лв / ${formatMoney(missing/RATE)} €`;
+            } else {
+                // Success state
+                els.errorBox.classList.add('hidden');
+                els.resultBox.classList.remove('hidden');
+                // Trigger reflow for animation
+                void els.resultBox.offsetWidth;
+                els.resultBox.classList.add('block', 'opacity-100');
+
+                updateResultDisplay(diffBGN);
+            }
+        }
+
+        function updateResultDisplay(amountBGN) {
+            let mainVal, mainSym, secVal, secSym;
+
+            if (resultCurrency === 'BGN') {
+                mainVal = amountBGN;
+                mainSym = 'лв';
+                secVal = amountBGN / RATE;
+                secSym = '€';
+            } else {
+                mainVal = amountBGN / RATE;
+                mainSym = '€';
+                secVal = amountBGN;
+                secSym = 'лв';
+            }
+
+            els.changeMain.innerHTML = `${formatMoney(mainVal)} <span class="text-2xl">${mainSym}</span>`;
+            els.changeSec.textContent = `${formatMoney(secVal)} ${secSym}`;
+        }
+
+        function formatMoney(num) {
+            return num.toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- EVENT LISTENERS ---
+        
+        // 1. Toggle Due Currency
+        els.toggleDue.addEventListener('click', () => {
+            dueCurrency = (dueCurrency === 'BGN') ? 'EUR' : 'BGN';
+            els.toggleDue.textContent = dueCurrency;
+            calculate();
         });
+
+        // 2. Result Toggles
+        els.btnResBGN.addEventListener('click', () => {
+            resultCurrency = 'BGN';
+            els.btnResBGN.classList.add('bg-white', 'text-blue-700', 'shadow-sm');
+            els.btnResBGN.classList.remove('text-blue-600', 'hover:bg-white/50');
+            
+            els.btnResEUR.classList.remove('bg-white', 'text-blue-700', 'shadow-sm');
+            els.btnResEUR.classList.add('text-blue-600', 'hover:bg-white/50');
+            calculate();
+        });
+
+        els.btnResEUR.addEventListener('click', () => {
+            resultCurrency = 'EUR';
+            els.btnResEUR.classList.add('bg-white', 'text-blue-700', 'shadow-sm');
+            els.btnResEUR.classList.remove('text-blue-600', 'hover:bg-white/50');
+            
+            els.btnResBGN.classList.remove('bg-white', 'text-blue-700', 'shadow-sm');
+            els.btnResBGN.classList.add('text-blue-600', 'hover:bg-white/50');
+            calculate();
+        });
+
+        // 3. Inputs
+        ['inputDue', 'inputPaidBGN', 'inputPaidEUR'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calculate);
+        });
+
+        // --- INITIALIZATION ---
+        initBackground();
+        initPWA();
 
     </script>
 </body>
 </html>
-            
-            
